@@ -71,6 +71,12 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.sceneView.isPlaying = true
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        self.audioPlayer.play()
+    }
+
     // MARK: - SCNSceneRendererDelegate
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {

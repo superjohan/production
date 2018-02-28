@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 import SceneKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, SCNSceneRendererDelegate {
     let audioPlayer: AVAudioPlayer
     let sceneView: SCNView
     let camera: SCNNode
@@ -41,6 +41,7 @@ class ViewController: UIViewController {
         
         self.view.backgroundColor = .black
         self.sceneView.backgroundColor = .black
+        self.sceneView.delegate = self
         
         self.view.addSubview(self.sceneView)
     }
@@ -65,8 +66,14 @@ class ViewController: UIViewController {
         super.viewWillAppear(animated)
      
         self.sceneView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: self.view.bounds.size.height)
+        self.sceneView.isPlaying = true
     }
     
+    // MARK: - SCNSceneRendererDelegate
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+    }
+
     // MARK: - Private
     
     fileprivate func createScene() -> SCNScene {
@@ -92,13 +99,38 @@ class ViewController: UIViewController {
         scene.rootNode.addChildNode(omniLightNode)
     }
     
+    var box: SCNBox?
+    
     fileprivate func configureBox(_ scene: SCNScene) {
-        let box = SCNBox(width: 10, height: 10, length: 10, chamferRadius: 0)
-        box.firstMaterial?.diffuse.contents = UIColor.init(white: 1.0, alpha: 1.0)
-
+        let box = SCNBox(width: 25, height: 25, length: 25, chamferRadius: 0)
+        applyNoiseShader(box)
+        
         let boxNode = SCNNode(geometry: box)
         boxNode.position = SCNVector3Make(0, 0, 0)
+    
+        boxNode.runAction(
+            SCNAction.repeatForever(
+                SCNAction.rotateBy(
+                    x: CGFloat(-10 + Int(arc4random_uniform(20))),
+                    y: CGFloat(-10 + Int(arc4random_uniform(20))),
+                    z: CGFloat(-10 + Int(arc4random_uniform(20))),
+                    duration: TimeInterval(8 + arc4random_uniform(5))
+                )
+            )
+        )
+
+        self.box = box
         
         scene.rootNode.addChildNode(boxNode)
+    }
+    
+    fileprivate func applyNoiseShader(_ object: SCNGeometry) {
+        do {
+            object.firstMaterial?.shaderModifiers = [
+                SCNShaderModifierEntryPoint.fragment: try String(contentsOfFile: Bundle.main.path(forResource: "noise.shader", ofType: "fragment")!, encoding: String.Encoding.utf8)
+            ]
+        } catch {}
+        
+        object.firstMaterial?.setValue(CGPoint(x: self.view.bounds.size.width, y: self.view.bounds.size.width), forKey: "resolution")
     }
 }

@@ -65,8 +65,6 @@ class ViewController: UIViewController {
         super.viewWillAppear(animated)
      
         self.sceneView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: self.view.bounds.size.height)
-        
-        print("moi")
     }
     
     // MARK: - Private

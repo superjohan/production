@@ -15,6 +15,8 @@ class ViewController: UIViewController {
     let sceneView: SCNView
     let camera: SCNNode
 
+    // MARK: - UIViewController
+    
     init() {
         if let trackUrl = Bundle.main.url(forResource: "audio", withExtension: "m4a") {
             guard let audioPlayer = try? AVAudioPlayer(contentsOf: trackUrl) else {
@@ -37,6 +39,9 @@ class ViewController: UIViewController {
         
         super.init(nibName: nil, bundle: nil)
         
+        self.view.backgroundColor = .black
+        self.sceneView.backgroundColor = .black
+        
         self.view.addSubview(self.sceneView)
     }
     
@@ -52,12 +57,50 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         self.audioPlayer.prepareToPlay()
+
+        self.sceneView.scene = createScene()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
      
         self.sceneView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: self.view.bounds.size.height)
+        
+        print("moi")
+    }
+    
+    // MARK: - Private
+    
+    fileprivate func createScene() -> SCNScene {
+        let scene = SCNScene()
+        scene.background.contents = UIColor.black
+
+        self.camera.position = SCNVector3Make(0, 0, 58)
+
+        scene.rootNode.addChildNode(self.camera)
+        
+        configureLight(scene)
+        configureBox(scene)
+        
+        return scene
+    }
+
+    fileprivate func configureLight(_ scene: SCNScene) {
+        let omniLightNode = SCNNode()
+        omniLightNode.light = SCNLight()
+        omniLightNode.light?.type = SCNLight.LightType.omni
+        omniLightNode.light?.color = UIColor(white: 1.0, alpha: 1.0)
+        omniLightNode.position = SCNVector3Make(0, 0, 60)
+        scene.rootNode.addChildNode(omniLightNode)
+    }
+    
+    fileprivate func configureBox(_ scene: SCNScene) {
+        let box = SCNBox(width: 10, height: 10, length: 10, chamferRadius: 0)
+        box.firstMaterial?.diffuse.contents = UIColor.init(white: 1.0, alpha: 1.0)
+
+        let boxNode = SCNNode(geometry: box)
+        boxNode.position = SCNVector3Make(0, 0, 0)
+        
+        scene.rootNode.addChildNode(boxNode)
     }
 }
-

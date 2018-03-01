@@ -12,9 +12,9 @@ import SceneKit
 
 class ViewController: UIViewController, SCNSceneRendererDelegate {
     let audioPlayer: AVAudioPlayer
-    let sceneView: SCNView
-    let camera: SCNNode
-
+    let sceneView = SCNView(frame: CGRect.zero)
+    let camera = SCNNode()
+    
     var boxes: [SCNNode] = []
 
     // MARK: - UIViewController
@@ -30,9 +30,6 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
             abort()
         }
         
-        self.sceneView = SCNView(frame: CGRect.zero)
-        
-        self.camera = SCNNode()
         let camera = SCNCamera()
         camera.zFar = 600
         camera.vignettingIntensity = 1

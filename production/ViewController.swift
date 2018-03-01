@@ -123,6 +123,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         perform(#selector(setSilent1State), with: NSNumber.init(booleanLiteral: false), afterDelay: 30)
         perform(#selector(setSilent2State), with: NSNumber.init(booleanLiteral: true), afterDelay: 32)
         perform(#selector(setSilent2State), with: NSNumber.init(booleanLiteral: false), afterDelay: 34)
+        perform(#selector(endItAll), with: nil, afterDelay: 36)
     }
     
     @objc
@@ -158,6 +159,11 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.isInSilent2State = silentStateBoolean.boolValue
     }
 
+    @objc
+    fileprivate func endItAll() {
+        self.sceneView.isHidden = true
+    }
+    
     fileprivate func updateErrorState() {
         let isHidden = arc4random_uniform(2) == 1 ? false : true
         self.sceneView.isHidden = isHidden

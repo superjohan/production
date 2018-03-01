@@ -12,18 +12,21 @@ import SceneKit
 
 class ViewController: UIViewController, SCNSceneRendererDelegate {
     let audioPlayer: AVAudioPlayer
-    let sceneView = SCNView(frame: CGRect.zero)
+    let sceneView = SCNView()
     let camera = SCNNode()
     let groupLogo = UIImageView(image: UIImage(named: "dekadence"))
     let nameLogo = UIImageView(image: UIImage(named: "production"))
     let errorView = UIView()
     
+    let silentSceneView = SCNView()
+    let silentSceneCamera = SCNCamera()
+    let silentSceneCameraNode = SCNNode()
+    
     let qtFoolingBgView: UIView = UIView.init(frame: CGRect.zero)
 
     var boxes: [SCNNode] = []
+    var silentSceneBox: SCNNode?
     var isInErrorState = false
-    var isInSilentState = false
-    var isInSilent2State = false
 
     // MARK: - UIViewController
     
@@ -44,6 +47,12 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         camera.vignettingPower = 1
         camera.colorFringeStrength = 3
         self.camera.camera = camera // lol
+
+        self.silentSceneCamera.wantsHDR = true
+        self.silentSceneCamera.bloomIntensity = 1
+        self.silentSceneCamera.bloomBlurRadius = 40
+        self.silentSceneCamera.colorFringeStrength = 3
+        self.silentSceneCameraNode.camera = self.silentSceneCamera
         
         super.init(nibName: nil, bundle: nil)
         
@@ -51,10 +60,13 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.sceneView.backgroundColor = .black
         self.sceneView.delegate = self
         
+        self.silentSceneView.isHidden = true
+        
         self.qtFoolingBgView.backgroundColor = UIColor(white: 0.1, alpha: 1.0)
 
         self.view.addSubview(self.qtFoolingBgView)
         self.view.addSubview(self.sceneView)
+        self.view.addSubview(self.silentSceneView)
         self.view.addSubview(self.groupLogo)
         self.view.addSubview(self.nameLogo)
         self.view.addSubview(self.errorView)
@@ -74,6 +86,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.audioPlayer.prepareToPlay()
 
         self.sceneView.scene = createScene()
+        self.silentSceneView.scene = createSilentScene()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -81,6 +94,9 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
      
         self.sceneView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: self.view.bounds.size.height)
         self.sceneView.isPlaying = true
+        
+        self.silentSceneView.frame = self.sceneView.frame
+        self.silentSceneView.isPlaying = true
         
         self.groupLogo.frame = self.sceneView.frame
         self.groupLogo.isHidden = true
@@ -163,12 +179,43 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
 
     @objc
     fileprivate func setSilent1State(silentStateBoolean: NSNumber) {
-        self.isInSilentState = silentStateBoolean.boolValue
+        let isInSilentState = silentStateBoolean.boolValue
+        
+        if isInSilentState {
+            self.sceneView.isHidden = true
+            self.silentSceneView.isHidden = false
+        } else {
+            self.sceneView.isHidden = false
+            self.silentSceneView.isHidden = true
+        }
     }
 
     @objc
     fileprivate func setSilent2State(silentStateBoolean: NSNumber) {
-        self.isInSilent2State = silentStateBoolean.boolValue
+        let isInSilent2State = silentStateBoolean.boolValue
+
+        if isInSilent2State {
+            self.sceneView.isHidden = true
+            self.silentSceneView.isHidden = false
+
+            let animation = CABasicAnimation(keyPath: "colorFringeStrength")
+            animation.fromValue = self.silentSceneCamera.colorFringeStrength
+            animation.toValue = 100
+            animation.duration = 2.0
+            animation.repeatCount = .infinity
+            self.silentSceneCamera.addAnimation(animation, forKey: "colorFringeStrength")
+            
+            let rotateAction = SCNAction.rotateTo(x: 0.2, y: 0.3, z: 0.4, duration: TimeInterval(2))
+            rotateAction.timingMode = SCNActionTimingMode.easeIn
+            self.silentSceneBox?.runAction(rotateAction)
+            
+            let zoomAction = SCNAction.move(to: SCNVector3Make(0, 0, 45), duration: TimeInterval(2))
+            zoomAction.timingMode = SCNActionTimingMode.easeIn
+            self.silentSceneCameraNode.runAction(zoomAction)
+        } else {
+            self.sceneView.isHidden = false
+            self.silentSceneView.isHidden = true
+        }
     }
 
     @objc
@@ -228,6 +275,29 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         return scene
     }
 
+    fileprivate func createSilentScene() -> SCNScene {
+        let scene = SCNScene()
+        scene.background.contents = UIColor.black
+        
+        self.silentSceneCameraNode.position = SCNVector3Make(0, 0, 58)
+        
+        scene.rootNode.addChildNode(self.silentSceneCameraNode)
+        
+        configureLight(scene)
+        
+        let box = SCNBox(width: 20, height: 20, length: 20, chamferRadius: 0)
+        box.firstMaterial?.diffuse.contents = UIColor.white
+        
+        let boxNode = SCNNode(geometry: box)
+        boxNode.position = SCNVector3Make(0, 0, 0)
+        
+        scene.rootNode.addChildNode(boxNode)
+        
+        self.silentSceneBox = boxNode
+        
+        return scene
+    }
+    
     fileprivate func configureLight(_ scene: SCNScene) {
         let omniLightNode = SCNNode()
         omniLightNode.light = SCNLight()

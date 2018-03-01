@@ -40,7 +40,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         camera.zFar = 600
         camera.vignettingIntensity = 1
         camera.vignettingPower = 1
-        camera.colorFringeStrength = 10
+        camera.colorFringeStrength = 3
         self.camera.camera = camera // lol
         
         super.init(nibName: nil, bundle: nil)

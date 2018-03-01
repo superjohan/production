@@ -18,6 +18,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     let nameLogo = UIImageView(image: UIImage(named: "production"))
     let errorView = UIView()
     
+    let qtFoolingBgView: UIView = UIView.init(frame: CGRect.zero)
+
     var boxes: [SCNNode] = []
     var isInErrorState = false
     var isInSilentState = false
@@ -49,6 +51,9 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.sceneView.backgroundColor = .black
         self.sceneView.delegate = self
         
+        self.qtFoolingBgView.backgroundColor = UIColor(white: 0.1, alpha: 1.0)
+
+        self.view.addSubview(self.qtFoolingBgView)
         self.view.addSubview(self.sceneView)
         self.view.addSubview(self.groupLogo)
         self.view.addSubview(self.nameLogo)
@@ -84,6 +89,13 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.nameLogo.isHidden = true
         
         self.errorView.isHidden = true
+
+        self.qtFoolingBgView.frame = CGRect(
+            x: (self.view.bounds.size.width / 2) - 1,
+            y: (self.view.bounds.size.height / 2) - 1,
+            width: 2,
+            height: 2
+        )
     }
     
     override func viewDidAppear(_ animated: Bool) {

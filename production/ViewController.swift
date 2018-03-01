@@ -14,6 +14,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     let audioPlayer: AVAudioPlayer
     let sceneView = SCNView(frame: CGRect.zero)
     let camera = SCNNode()
+    let groupLogo = UIImageView(image: UIImage(named: "dekadence"))
+    let nameLogo = UIImageView(image: UIImage(named: "production"))
     
     var boxes: [SCNNode] = []
 
@@ -43,6 +45,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.sceneView.delegate = self
         
         self.view.addSubview(self.sceneView)
+        self.view.addSubview(self.groupLogo)
+        self.view.addSubview(self.nameLogo)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -66,6 +70,12 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
      
         self.sceneView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: self.view.bounds.size.height)
         self.sceneView.isPlaying = true
+        
+        self.groupLogo.frame = self.sceneView.frame
+        self.groupLogo.isHidden = true
+        
+        self.nameLogo.frame = self.sceneView.frame
+        self.nameLogo.isHidden = true
     }
     
     override func viewDidAppear(_ animated: Bool) {

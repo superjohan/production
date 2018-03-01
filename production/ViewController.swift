@@ -144,6 +144,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         
         if !errorState {
             self.sceneView.isHidden = false
+            self.errorView.isHidden = true
         }
     }
 

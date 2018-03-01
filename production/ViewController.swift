@@ -16,6 +16,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     let camera = SCNNode()
     let groupLogo = UIImageView(image: UIImage(named: "dekadence"))
     let nameLogo = UIImageView(image: UIImage(named: "production"))
+    let errorView = UIView()
     
     var boxes: [SCNNode] = []
     var isInErrorState = false
@@ -50,6 +51,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.view.addSubview(self.sceneView)
         self.view.addSubview(self.groupLogo)
         self.view.addSubview(self.nameLogo)
+        self.view.addSubview(self.errorView)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -79,6 +81,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         
         self.nameLogo.frame = self.sceneView.frame
         self.nameLogo.isHidden = true
+        
+        self.errorView.isHidden = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -92,7 +96,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         DispatchQueue.main.async {
             if (self.isInErrorState) {
-                self.sceneView.isHidden = arc4random_uniform(2) == 1 ? false : true
+                self.updateErrorState()
             }
         }
     }
@@ -152,6 +156,44 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.isInSilent2State = silentStateBoolean.boolValue
     }
 
+    fileprivate func updateErrorState() {
+        let isHidden = arc4random_uniform(2) == 1 ? false : true
+        self.sceneView.isHidden = isHidden
+        
+        if !isHidden {
+            let isErrorViewHidden = arc4random_uniform(2) == 1 ? false : true
+            self.errorView.isHidden = isErrorViewHidden
+            if !isErrorViewHidden {
+                let horizontal = arc4random_uniform(2) == 1 ? false : true
+                
+                if horizontal {
+                    self.errorView.frame = CGRect(
+                        x: 0,
+                        y: CGFloat(arc4random_uniform(UInt32(self.view.bounds.size.height))),
+                        width: self.view.bounds.size.width,
+                        height: CGFloat(arc4random_uniform(300))
+                    )
+                } else {
+                    self.errorView.frame = CGRect(
+                        x: CGFloat(arc4random_uniform(UInt32(self.view.bounds.size.width))),
+                        y: 0,
+                        width: CGFloat(arc4random_uniform(400)),
+                        height: self.view.bounds.size.height
+                    )
+                }
+                
+                switch (arc4random_uniform(5)) {
+                case 0:
+                    self.errorView.backgroundColor = .green
+                default:
+                    self.errorView.backgroundColor = .black
+                }
+            }
+        } else {
+            self.errorView.isHidden = true
+        }
+    }
+    
     fileprivate func createScene() -> SCNScene {
         let scene = SCNScene()
         scene.background.contents = UIColor.black

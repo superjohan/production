@@ -17,7 +17,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     let groupLogo = UIImageView(image: UIImage(named: "dekadence"))
     let nameLogo = UIImageView(image: UIImage(named: "production"))
     let errorView = UIView()
-    
+    let startButton: UIButton
+
     let silentSceneView = SCNView()
     let silentSceneCamera = SCNCamera()
     let silentSceneCameraNode = SCNNode()
@@ -54,8 +55,25 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.silentSceneCamera.colorFringeStrength = 3
         self.silentSceneCameraNode.camera = self.silentSceneCamera
         
+        let startButtonText =
+            "\"production\"\n" +
+                "by dekadence\n" +
+                "\n" +
+                "programming and music by ricky martin\n" +
+                "\n" +
+                "presented at instanssi 2018\n" +
+                "\n" +
+        "tap anywhere to start"
+        self.startButton = UIButton.init(type: UIButtonType.custom)
+        self.startButton.setTitle(startButtonText, for: UIControlState.normal)
+        self.startButton.titleLabel?.numberOfLines = 0
+        self.startButton.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        self.startButton.backgroundColor = UIColor.black
+
         super.init(nibName: nil, bundle: nil)
         
+        self.startButton.addTarget(self, action: #selector(startButtonTouched), for: UIControlEvents.touchUpInside)
+
         self.view.backgroundColor = .black
         self.sceneView.backgroundColor = .black
         self.sceneView.delegate = self
@@ -70,6 +88,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         self.view.addSubview(self.groupLogo)
         self.view.addSubview(self.nameLogo)
         self.view.addSubview(self.errorView)
+        self.view.addSubview(self.startButton)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -92,9 +111,12 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
      
+        self.startButton.frame = CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: self.view.bounds.size.height)
+
         self.sceneView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.size.width, height: self.view.bounds.size.height)
         self.sceneView.isPlaying = true
-        
+        self.sceneView.isHidden = true
+
         self.silentSceneView.frame = self.sceneView.frame
         self.silentSceneView.isPlaying = true
         
@@ -114,12 +136,6 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         )
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        start()
-    }
-
     // MARK: - SCNSceneRendererDelegate
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
@@ -132,8 +148,20 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
 
     // MARK: - Private
     
+    @objc private func startButtonTouched(button: UIButton) {
+        self.startButton.isUserInteractionEnabled = false
+        
+        UIView.animate(withDuration: 4, animations: {
+            self.startButton.alpha = 0
+        }, completion: { _ in
+            self.start()
+        })
+    }
+
     fileprivate func start() {
         scheduleEvents()
+        
+        self.sceneView.isHidden = false
         
         self.audioPlayer.play()
     }

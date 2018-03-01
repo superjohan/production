@@ -18,6 +18,9 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     let nameLogo = UIImageView(image: UIImage(named: "production"))
     
     var boxes: [SCNNode] = []
+    var isInErrorState = false
+    var isInSilentState = false
+    var isInSilent2State = false
 
     // MARK: - UIViewController
     
@@ -81,16 +84,74 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        self.audioPlayer.play()
+        start()
     }
 
     // MARK: - SCNSceneRendererDelegate
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        DispatchQueue.main.async {
+            if (self.isInErrorState) {
+                self.sceneView.isHidden = arc4random_uniform(2) == 1 ? false : true
+            }
+        }
     }
 
     // MARK: - Private
     
+    fileprivate func start() {
+        scheduleEvents()
+        
+        self.audioPlayer.play()
+    }
+    
+    fileprivate func scheduleEvents() {
+        perform(#selector(showGroupLogo), with: NSNumber.init(booleanLiteral: true), afterDelay: 4)
+        perform(#selector(showGroupLogo), with: NSNumber.init(booleanLiteral: false), afterDelay: 6)
+        perform(#selector(setErrorState), with: NSNumber.init(booleanLiteral: true), afterDelay: 10)
+        perform(#selector(setErrorState), with: NSNumber.init(booleanLiteral: false), afterDelay: 12)
+        perform(#selector(showNameLogo), with: NSNumber.init(booleanLiteral: true), afterDelay: 16)
+        perform(#selector(showNameLogo), with: NSNumber.init(booleanLiteral: false), afterDelay: 18)
+        perform(#selector(setErrorState), with: NSNumber.init(booleanLiteral: true), afterDelay: 22)
+        perform(#selector(setErrorState), with: NSNumber.init(booleanLiteral: false), afterDelay: 24)
+        perform(#selector(setSilent1State), with: NSNumber.init(booleanLiteral: true), afterDelay: 28)
+        perform(#selector(setSilent1State), with: NSNumber.init(booleanLiteral: false), afterDelay: 30)
+        perform(#selector(setSilent2State), with: NSNumber.init(booleanLiteral: true), afterDelay: 32)
+        perform(#selector(setSilent2State), with: NSNumber.init(booleanLiteral: false), afterDelay: 34)
+    }
+    
+    @objc
+    fileprivate func showGroupLogo(showBoolean: NSNumber) {
+        let show = showBoolean.boolValue
+        self.groupLogo.isHidden = !show
+    }
+
+    @objc
+    fileprivate func showNameLogo(showBoolean: NSNumber) {
+        let show = showBoolean.boolValue
+        self.nameLogo.isHidden = !show
+    }
+    
+    @objc
+    fileprivate func setErrorState(errorStateBoolean: NSNumber) {
+        let errorState = errorStateBoolean.boolValue
+        self.isInErrorState = errorState
+        
+        if !errorState {
+            self.sceneView.isHidden = false
+        }
+    }
+
+    @objc
+    fileprivate func setSilent1State(silentStateBoolean: NSNumber) {
+        self.isInSilentState = silentStateBoolean.boolValue
+    }
+
+    @objc
+    fileprivate func setSilent2State(silentStateBoolean: NSNumber) {
+        self.isInSilent2State = silentStateBoolean.boolValue
+    }
+
     fileprivate func createScene() -> SCNScene {
         let scene = SCNScene()
         scene.background.contents = UIColor.black

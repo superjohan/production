@@ -109,22 +109,23 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     
     fileprivate func configureBoxes(_ scene: SCNScene) {
         let box = SCNBox(width: 200, height: 200, length: 200, chamferRadius: 0)
-        applyNoiseShader(object: box, scale: 75.0)
+        let scale: Float = 150
+        applyNoiseShader(object: box, scale: scale)
         box.firstMaterial?.isDoubleSided = true
 
         let boxNode = SCNNode(geometry: box)
-        boxNode.position = SCNVector3Make(0, 0, 0)
+        boxNode.position = SCNVector3Make(0, 0, -90)
 
         scene.rootNode.addChildNode(boxNode)
         
         scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(-20, 20, 0), scale: 150.0, size: 25)
+            createBox(position: SCNVector3Make(-20, 20, 0), scale: scale, size: 25)
         )
         scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(25, 0, 0), scale: 200.0, size: 30)
+            createBox(position: SCNVector3Make(25, 0, 0), scale: scale, size: 30)
         )
         scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(-10, -15, 0), scale: 300.0, size: 20)
+            createBox(position: SCNVector3Make(-10, -15, 0), scale: scale, size: 20)
         )
     }
     

@@ -119,10 +119,10 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         scene.rootNode.addChildNode(boxNode)
         
         scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(-20, 20, 0), scale: scale, size: 25)
+            createBox(position: SCNVector3Make(-20, 20, 0), scale: scale + 20, size: 25)
         )
         scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(25, 0, 0), scale: scale, size: 30)
+            createBox(position: SCNVector3Make(25, 0, 0), scale: scale - 20, size: 30)
         )
         scene.rootNode.addChildNode(
             createBox(position: SCNVector3Make(-10, -15, 0), scale: scale, size: 20)

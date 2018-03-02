@@ -13,6 +13,7 @@ import SceneKit
 class ViewController: UIViewController, SCNSceneRendererDelegate {
     let defaultNoiseScale: Float = 150
     
+    let lightUpdater = UdpLightUpdater()
     let audioPlayer: AVAudioPlayer
     let sceneView = SCNView()
     let camera = SCNNode()
@@ -31,7 +32,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     var backgroundBox: SCNNode?
     var silentSceneBox: SCNNode?
     var isInErrorState = false
-
+    var isInSilentState = false
+    
     // MARK: - UIViewController
     
     init() {
@@ -154,6 +156,10 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         DispatchQueue.main.async {
             if (self.isInErrorState) {
                 self.updateErrorState()
+            } else if (self.isInSilentState) {
+                self.lightUpdater.send(on: true)
+            } else {
+                self.lightUpdater.send(on: false)
             }
         }
     }
@@ -226,6 +232,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     @objc
     fileprivate func setSilent1State(silentStateBoolean: NSNumber) {
         let isInSilentState = silentStateBoolean.boolValue
+        self.isInSilentState = isInSilentState
         
         if isInSilentState {
             self.sceneView.isHidden = true
@@ -239,6 +246,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     @objc
     fileprivate func setSilent2State(silentStateBoolean: NSNumber) {
         let isInSilent2State = silentStateBoolean.boolValue
+        self.isInSilentState = isInSilent2State
 
         if isInSilent2State {
             self.sceneView.isHidden = true
@@ -272,10 +280,13 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     fileprivate func updateErrorState() {
         let isHidden = arc4random_uniform(2) == 1 ? false : true
         self.sceneView.isHidden = isHidden
-        
+
+        self.lightUpdater.send(on: !isHidden)
+
         if !isHidden {
             let isErrorViewHidden = arc4random_uniform(2) == 1 ? false : true
             self.errorView.isHidden = isErrorViewHidden
+
             if !isErrorViewHidden {
                 let horizontal = arc4random_uniform(2) == 1 ? false : true
                 

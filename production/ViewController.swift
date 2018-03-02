@@ -346,15 +346,19 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
 
         scene.rootNode.addChildNode(boxNode)
         
-        scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(-20, 20, 0), scale: scale + 20, size: 25)
-        )
-        scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(25, 0, 0), scale: scale - 20, size: 30)
-        )
-        scene.rootNode.addChildNode(
-            createBox(position: SCNVector3Make(-10, -15, 0), scale: scale, size: 20)
-        )
+        for _ in 0..<10 {
+            scene.rootNode.addChildNode(
+                createBox(
+                    position: SCNVector3Make(
+                        Float(-30 + Int(arc4random_uniform(60))),
+                        Float(-20 + Int(arc4random_uniform(40))),
+                        0
+                    ),
+                    scale: scale,
+                    size: CGFloat(20 + arc4random_uniform(20))
+                )
+            )
+        }
     }
     
     fileprivate func createBox(position: SCNVector3, scale: Float, size: CGFloat) -> SCNNode {

@@ -11,6 +11,8 @@ import AVFoundation
 import SceneKit
 
 class ViewController: UIViewController, SCNSceneRendererDelegate {
+    let defaultNoiseScale: Float = 150
+    
     let audioPlayer: AVAudioPlayer
     let sceneView = SCNView()
     let camera = SCNNode()
@@ -26,6 +28,7 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     let qtFoolingBgView: UIView = UIView.init(frame: CGRect.zero)
 
     var boxes: [SCNNode] = []
+    var backgroundBox: SCNNode?
     var silentSceneBox: SCNNode?
     var isInErrorState = false
 
@@ -199,6 +202,10 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         let errorState = errorStateBoolean.boolValue
         self.isInErrorState = errorState
         
+        for box in self.boxes {
+            box.isPaused = errorState
+        }
+        
         if !errorState {
             self.sceneView.isHidden = false
             self.errorView.isHidden = true
@@ -284,9 +291,22 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
                     self.errorView.backgroundColor = .black
                 }
             }
+
+            let scale = 10 + Float(arc4random_uniform(140))
+            applyNoiseScaleToAllBoxes(scale: scale)
         } else {
             self.errorView.isHidden = true
+            
+            applyNoiseScaleToAllBoxes(scale: self.defaultNoiseScale)
         }
+    }
+    
+    fileprivate func applyNoiseScaleToAllBoxes(scale: Float) {
+        for boxNode in self.boxes {
+            boxNode.geometry?.firstMaterial?.setValue(scale, forKey: "scale")
+        }
+
+        self.backgroundBox?.geometry?.firstMaterial?.setValue(scale, forKey: "scale")
     }
     
     fileprivate func createScene() -> SCNScene {
@@ -337,27 +357,29 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     
     fileprivate func configureBoxes(_ scene: SCNScene) {
         let box = SCNBox(width: 200, height: 200, length: 200, chamferRadius: 0)
-        let scale: Float = 150
-        applyNoiseShader(object: box, scale: scale)
+        applyNoiseShader(object: box, scale: self.defaultNoiseScale)
         box.firstMaterial?.isDoubleSided = true
-
+        
         let boxNode = SCNNode(geometry: box)
         boxNode.position = SCNVector3Make(0, 0, -90)
-
+        self.backgroundBox = boxNode
+        
         scene.rootNode.addChildNode(boxNode)
         
-        for _ in 0..<10 {
-            scene.rootNode.addChildNode(
-                createBox(
-                    position: SCNVector3Make(
-                        Float(-30 + Int(arc4random_uniform(60))),
-                        Float(-20 + Int(arc4random_uniform(40))),
-                        0
-                    ),
-                    scale: scale,
-                    size: CGFloat(20 + arc4random_uniform(20))
-                )
+        for _ in 0..<5 {
+            let boxNode: SCNNode = createBox(
+                position: SCNVector3Make(
+                    Float(-30 + Int(arc4random_uniform(60))),
+                    Float(-20 + Int(arc4random_uniform(40))),
+                    0
+                ),
+                scale: self.defaultNoiseScale,
+                size: CGFloat(10 + arc4random_uniform(20))
             )
+            
+            self.boxes.append(boxNode)
+
+            scene.rootNode.addChildNode(boxNode)
         }
     }
     

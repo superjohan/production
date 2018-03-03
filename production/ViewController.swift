@@ -209,6 +209,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         if !errorState {
             self.sceneView.isHidden = false
             self.errorView.isHidden = true
+
+            applyNoiseScaleToAllBoxes(scale: self.defaultNoiseScale)
         }
     }
 
@@ -296,8 +298,6 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
             applyNoiseScaleToAllBoxes(scale: scale)
         } else {
             self.errorView.isHidden = true
-            
-            applyNoiseScaleToAllBoxes(scale: self.defaultNoiseScale)
         }
     }
     

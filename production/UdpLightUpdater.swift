@@ -25,23 +25,63 @@ import Foundation
 class UdpLightUpdater {
     let socket: GCDAsyncUdpSocket = GCDAsyncUdpSocket()
     
-    init() {
-    }
-    
-    func send(on: Bool) {
+    func send(leftColorR: UInt8,
+              leftColorG: UInt8,
+              leftColorB: UInt8,
+              middleColorR: UInt8,
+              middleColorG: UInt8,
+              middleColorB: UInt8,
+              rightColorR: UInt8,
+              rightColorG: UInt8,
+              rightColorB: UInt8) {
         var dataPacket = Array<UInt8>()
         dataPacket.append(1)
-
+        
         for i in 0..<24 {
             dataPacket.append(1)
             dataPacket.append(UInt8(i))
             dataPacket.append(0)
-            dataPacket.append(on ? 0xff : 0x00)
-            dataPacket.append(on ? 0xff : 0x00)
-            dataPacket.append(on ? 0xff : 0x00)
+            
+            let r: UInt8
+            let g: UInt8
+            let b: UInt8
+
+            if i >= 0 && i < 8 {
+                r = leftColorR;
+                g = leftColorG;
+                b = leftColorB;
+            } else if i >= 8 && i < 16 {
+                r = middleColorR;
+                g = middleColorG;
+                b = middleColorB;
+            } else {
+                r = rightColorR;
+                g = rightColorG;
+                b = rightColorB;
+            }
+                        
+            dataPacket.append(r)
+            dataPacket.append(g)
+            dataPacket.append(b)
         }
         
         let data = Data(bytes: dataPacket)
         self.socket.send(data, toHost: "valot.party", port: 9909, withTimeout: -1, tag: 1)
+    }
+    
+    func send(on: Bool) {
+        let component: UInt8 = on ? 0xff : 0x00
+
+        send(
+            leftColorR: component,
+            leftColorG: component,
+            leftColorB: component,
+            middleColorR: component,
+            middleColorG: component,
+            middleColorB: component,
+            rightColorR: component,
+            rightColorG: component,
+            rightColorB: component
+        )
     }
 }

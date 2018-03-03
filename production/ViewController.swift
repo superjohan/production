@@ -33,7 +33,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     var silentSceneBox: SCNNode?
     var isInErrorState = false
     var isInSilentState = false
-    
+    var isInSilent2State = false
+
     // MARK: - UIViewController
     
     init() {
@@ -152,10 +153,32 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     
     // MARK: - SCNSceneRendererDelegate
     
+    var silent2start: TimeInterval = -1
+    
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         DispatchQueue.main.async {
             if (self.isInErrorState) {
                 self.updateErrorState()
+            } else if (self.isInSilent2State) {
+                if self.silent2start < 0 {
+                    self.silent2start = time
+                    self.lightUpdater.send(on: true)
+                } else {
+                    let delta = time - self.silent2start
+                    let color: UInt8 = 255 - UInt8(((delta / 2.0) * 255.0))
+                    
+                    self.lightUpdater.send(
+                        leftColorR: 0xff,
+                        leftColorG: color,
+                        leftColorB: color,
+                        middleColorR: 0xff,
+                        middleColorG: 0xff,
+                        middleColorB: 0xff,
+                        rightColorR: color,
+                        rightColorG: color,
+                        rightColorB: 0xff
+                    )
+                }
             } else if (self.isInSilentState) {
                 self.lightUpdater.send(on: true)
             } else {
@@ -247,7 +270,8 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
     fileprivate func setSilent2State(silentStateBoolean: NSNumber) {
         let isInSilent2State = silentStateBoolean.boolValue
         self.isInSilentState = isInSilent2State
-
+        self.isInSilent2State = isInSilent2State
+        
         if isInSilent2State {
             self.sceneView.isHidden = true
             self.silentSceneView.isHidden = false

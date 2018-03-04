@@ -85,6 +85,9 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         
         self.qtFoolingBgView.backgroundColor = UIColor(white: 0.1, alpha: 1.0)
 
+        self.groupLogo.contentMode = UIViewContentMode.scaleAspectFit
+        self.nameLogo.contentMode = UIViewContentMode.scaleAspectFit
+        
         self.view.addSubview(self.qtFoolingBgView)
         self.view.addSubview(self.sceneView)
         self.view.addSubview(self.silentSceneView)

@@ -6,4 +6,4 @@ Best viewed on an iPhone X. Apple's piece of shit digital video adapter is terri
 
 Released in the demo compo at Instanssi 2018, and came 7th.
 
-This demo also integrates with Instanssi's light system. That work exists in the [feature/instanssi_lights](https://github.com/superjohan/production/tree/feature/instanssi_lights) branch.
+This demo also integrates with Instanssi's light system. That work exists in the [feature/instanssi_lights](https://github.com/superjohan/production/tree/feature/instanssi_lights) branch. Huge thanks to Waffle for helping me work it out.

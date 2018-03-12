@@ -142,6 +142,12 @@ class ViewController: UIViewController, SCNSceneRendererDelegate {
         )
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        self.audioPlayer.stop()
+    }
+    
     // MARK: - SCNSceneRendererDelegate
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
